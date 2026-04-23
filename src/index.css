@@ -3,49 +3,68 @@
 @tailwind utilities;
 
 @layer base {
+  /* DiamondOS — dark navy as default */
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-    --primary: 142 76% 36%;
-    --primary-foreground: 355.7 100% 97.3%;
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 142 76% 36%;
-    --radius: 0.75rem;
+    --background:    215 58% 12%;   /* #0c1a2e navy-900 */
+    --foreground:    210 40% 96%;
+    --card:          215 52% 16%;   /* navy-800 ish */
+    --card-foreground: 210 40% 96%;
+    --popover:       215 52% 14%;
+    --popover-foreground: 210 40% 96%;
+    --primary:       153 71% 36%;   /* #18a163 emerald-500 */
+    --primary-foreground: 0 0% 100%;
+    --secondary:     215 40% 22%;
+    --secondary-foreground: 210 40% 90%;
+    --muted:         215 40% 20%;
+    --muted-foreground: 215 20% 55%;
+    --accent:        215 40% 22%;
+    --accent-foreground: 210 40% 96%;
+    --destructive:   0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+    --border:        215 32% 22%;
+    --input:         215 32% 22%;
+    --ring:          153 71% 36%;
+    --radius:        0.625rem;      /* 10px */
+
+    /* DiamondOS semantic tokens */
+    --sidebar-bg:    215 62% 9%;    /* navy-950 */
+    --sidebar-fg:    215 20% 65%;
+    --sidebar-active-bg: 153 71% 36%;
+    --sidebar-active-fg: 0 0% 100%;
+    --sidebar-hover-bg: 215 44% 16%;
+    --topbar-bg:     215 58% 11%;
+    --success:       153 71% 36%;
+    --warning:       38 92% 50%;
+    --safety:        0 72% 51%;
   }
 
-  .dark {
-    --background: 222 20% 9%;
-    --foreground: 210 40% 98%;
-    --card: 222 20% 12%;
-    --card-foreground: 210 40% 98%;
-    --popover: 222 20% 12%;
-    --popover-foreground: 210 40% 98%;
-    --primary: 142 70% 45%;
-    --primary-foreground: 144 61% 20%;
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 142 70% 45%;
+  /* Light mode override (toggled via .light class) */
+  .light {
+    --background:    0 0% 98%;
+    --foreground:    215 50% 12%;
+    --card:          0 0% 100%;
+    --card-foreground: 215 50% 12%;
+    --popover:       0 0% 100%;
+    --popover-foreground: 215 50% 12%;
+    --primary:       153 71% 36%;
+    --primary-foreground: 0 0% 100%;
+    --secondary:     215 20% 94%;
+    --secondary-foreground: 215 50% 12%;
+    --muted:         215 20% 94%;
+    --muted-foreground: 215 16% 46%;
+    --accent:        215 20% 94%;
+    --accent-foreground: 215 50% 12%;
+    --destructive:   0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --border:        215 20% 88%;
+    --input:         215 20% 88%;
+    --ring:          153 71% 36%;
+    --sidebar-bg:    215 62% 9%;
+    --sidebar-fg:    215 20% 65%;
+    --sidebar-active-bg: 153 71% 36%;
+    --sidebar-active-fg: 0 0% 100%;
+    --sidebar-hover-bg: 215 44% 16%;
+    --topbar-bg:     0 0% 100%;
   }
 }
 
@@ -53,17 +72,63 @@
   * {
     @apply border-border;
   }
+  html {
+    color-scheme: dark;
+  }
   body {
     @apply bg-background text-foreground;
+    font-family: "DM Sans", system-ui, sans-serif;
     font-feature-settings: "rlig" 1, "calt" 1;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    font-family: "Syne", system-ui, sans-serif;
+    font-weight: 700;
+  }
+}
+
+@layer components {
+  /* DiamondOS Card */
+  .dos-card {
+    @apply rounded-xl border bg-card shadow-card;
+  }
+  .dos-card-lg {
+    @apply rounded-xl border bg-card shadow-card-lg;
+  }
+
+  /* Status pills */
+  .pill-safety {
+    @apply inline-flex items-center gap-1 rounded-full bg-red-500/15 px-2 py-0.5 text-xs font-medium text-red-400;
+  }
+  .pill-warning {
+    @apply inline-flex items-center gap-1 rounded-full bg-amber-500/15 px-2 py-0.5 text-xs font-medium text-amber-400;
+  }
+  .pill-success {
+    @apply inline-flex items-center gap-1 rounded-full bg-emerald-500/15 px-2 py-0.5 text-xs font-medium text-emerald-400;
+  }
+  .pill-info {
+    @apply inline-flex items-center gap-1 rounded-full bg-blue-500/15 px-2 py-0.5 text-xs font-medium text-blue-400;
+  }
+
+  /* Skill bar */
+  .skill-bar {
+    @apply h-1.5 rounded-full bg-white/10 overflow-hidden;
+  }
+  .skill-bar-fill {
+    @apply h-full rounded-full bg-emerald-500 transition-all duration-500;
+  }
+
+  /* Sidebar nav section label */
+  .nav-section-label {
+    @apply px-3 pt-4 pb-1 text-[10px] font-semibold uppercase tracking-widest text-white/30;
   }
 }
 
 @layer utilities {
   .scrollbar-thin {
     scrollbar-width: thin;
+    scrollbar-color: hsl(var(--border)) transparent;
   }
   .scrollbar-none {
     scrollbar-width: none;
@@ -79,10 +144,20 @@
 
   .glass {
     backdrop-filter: blur(12px);
-    background: rgba(255, 255, 255, 0.8);
+    background: rgba(12, 26, 46, 0.75);
+    border: 1px solid rgba(255,255,255,0.08);
   }
 
-  .dark .glass {
-    background: rgba(15, 20, 30, 0.8);
+  .text-gradient-green {
+    background: linear-gradient(135deg, #18a163 0%, #4db380 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
   }
+
+  /* Entity tier indentation helpers */
+  .tier-1 { @apply pl-0; }
+  .tier-2 { @apply pl-4 border-l border-white/10; }
+  .tier-3 { @apply pl-8 border-l border-white/10; }
+  .tier-4 { @apply pl-12 border-l border-white/10; }
 }

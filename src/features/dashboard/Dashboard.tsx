@@ -2,8 +2,6 @@ import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
   Wand2,
-  Layout,
-  Plus,
   Clock,
   Users,
   Target,
@@ -11,379 +9,316 @@ import {
   ChevronRight,
   Play,
   FileText,
+  CalendarDays,
+  AlertTriangle,
+  TrendingDown,
+  Bell,
+  Zap,
+  BarChart3,
   Star,
-  Calendar,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
 import { usePracticeStore, useTeamStore } from "@/store";
 import { formatMinutes, AGE_GROUP_LABELS, CATEGORY_LABELS } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 
-const fadeInUp = {
-  hidden: { opacity: 0, y: 16 },
+// ─── Animation variants ────────────────────────────────────────────────────────
+
+const fadeUp = {
+  hidden:  { opacity: 0, y: 14 },
   visible: (i: number) => ({
-    opacity: 1,
-    y: 0,
-    transition: { delay: i * 0.07, duration: 0.35 },
+    opacity: 1, y: 0,
+    transition: { delay: i * 0.07, duration: 0.32 },
   }),
 };
 
-function QuickAction({
-  icon: Icon,
-  title,
-  description,
-  to,
-  variant = "default",
-  index,
-}: {
-  icon: React.ComponentType<{ className?: string }>;
-  title: string;
-  description: string;
-  to: string;
-  variant?: "primary" | "default";
-  index: number;
-}) {
-  return (
-    <motion.div
-      custom={index}
-      initial="hidden"
-      animate="visible"
-      variants={fadeInUp}
-    >
-      <Link to={to}>
-        <Card
-          className={`cursor-pointer transition-all hover:shadow-md hover:-translate-y-0.5 active:scale-[0.99] ${
-            variant === "primary"
-              ? "border-primary/30 bg-gradient-to-br from-primary/5 to-primary/10"
-              : ""
-          }`}
-        >
-          <CardContent className="flex items-start gap-4 p-5">
-            <div
-              className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${
-                variant === "primary"
-                  ? "bg-primary text-primary-foreground"
-                  : "bg-muted text-muted-foreground"
-              }`}
-            >
-              <Icon className="h-5 w-5" />
-            </div>
-            <div className="flex-1 min-w-0">
-              <h3 className="font-semibold text-sm">{title}</h3>
-              <p className="text-xs text-muted-foreground mt-0.5">{description}</p>
-            </div>
-            <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0 mt-0.5" />
-          </CardContent>
-        </Card>
-      </Link>
-    </motion.div>
-  );
-}
+// ─── Quick notification items (pinned alerts) ──────────────────────────────────
 
-function StatCard({
-  icon: Icon,
-  label,
-  value,
-  sub,
-  color,
-  index,
-}: {
-  icon: React.ComponentType<{ className?: string }>;
-  label: string;
-  value: string | number;
-  sub?: string;
-  color: string;
-  index: number;
-}) {
-  return (
-    <motion.div custom={index} initial="hidden" animate="visible" variants={fadeInUp}>
-      <Card>
-        <CardContent className="flex items-start gap-4 p-5">
-          <div className={`flex h-10 w-10 items-center justify-center rounded-xl ${color}`}>
-            <Icon className="h-5 w-5" />
-          </div>
-          <div>
-            <p className="text-xs text-muted-foreground font-medium">{label}</p>
-            <p className="text-2xl font-bold leading-tight">{value}</p>
-            {sub && <p className="text-xs text-muted-foreground">{sub}</p>}
-          </div>
-        </CardContent>
-      </Card>
-    </motion.div>
-  );
-}
+const PINNED_ALERTS = [
+  {
+    type: "safety",
+    message: "Marcus T. approaching pitch limit (82/85)",
+    action: "View profile",
+  },
+  {
+    type: "safety",
+    message: "Jordan K. reported arm soreness today",
+    action: "Review",
+  },
+  {
+    type: "engagement",
+    message: "Attendance dipped to 70% this week (-18%)",
+    action: "See analytics",
+  },
+];
+
+// ─── Upcoming events ───────────────────────────────────────────────────────────
+
+const UPCOMING = [
+  { date: "Apr 13", label: "Fielding Focus Practice",   type: "practice", time: "4:00 PM" },
+  { date: "Apr 15", label: "vs. River Hawks",            type: "game",     time: "5:30 PM" },
+  { date: "Apr 17", label: "Hitting Session",            type: "practice", time: "4:00 PM" },
+  { date: "Apr 19", label: "vs. Storm Chasers (scrim.)", type: "scrimmage", time: "10:00 AM" },
+];
+
+const EVENT_DOT: Record<string, string> = {
+  practice:  "bg-emerald-500",
+  game:      "bg-blue-400",
+  scrimmage: "bg-amber-400",
+};
+
+// ─── Component ────────────────────────────────────────────────────────────────
 
 export function Dashboard() {
-  const practices = usePracticeStore((s) => s.practices);
-  const teams = useTeamStore((s) => s.teams);
-  const activeTeamId = useTeamStore((s) => s.activeTeamId);
-  const activeTeam = teams.find((t) => t.id === activeTeamId) ?? teams[0];
-  const recentPractices = practices.slice(0, 3);
-  const savedPlans = practices.filter((p) => p.status === "saved").length;
+  const practices     = usePracticeStore((s) => s.practices);
+  const teams         = useTeamStore((s) => s.teams);
+  const activeTeamId  = useTeamStore((s) => s.activeTeamId);
+  const activeTeam    = teams.find((t) => t.id === activeTeamId) ?? teams[0];
+  const recentPractices = practices.slice(0, 4);
+  const savedPlans    = practices.filter((p) => p.status === "saved").length;
+  const avgDuration   = practices.length > 0
+    ? Math.round(practices.reduce((a, p) => a + p.totalMinutes, 0) / practices.length)
+    : 0;
+  const totalDrills   = practices.reduce((a, p) => a + p.blocks.length, 0);
 
   return (
-    <div className="max-w-5xl mx-auto space-y-8">
-      {/* Hero welcome */}
+    <div className="max-w-6xl mx-auto space-y-6">
+      {/* Hero row */}
       <motion.div
         initial={{ opacity: 0, y: -8 }}
         animate={{ opacity: 1, y: 0 }}
-        className="flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+        className="flex items-center justify-between gap-4"
       >
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">
-            Good morning, Coach 👋
+          <h1 className="font-heading text-2xl font-bold text-white">
+            Good morning, Coach
           </h1>
-          <p className="text-muted-foreground mt-1">
+          <p className="text-sm text-white/40 mt-1">
             {activeTeam
               ? `${activeTeam.name} · ${AGE_GROUP_LABELS[activeTeam.ageGroup]} ${activeTeam.sport}`
-              : "Ready to build your next great practice?"}
+              : "Spring 2026 Season"}
           </p>
         </div>
         <Link to="/app/generate">
-          <Button variant="brand" size="lg" className="gap-2">
-            <Wand2 className="h-4 w-4" />
+          <button className="flex items-center gap-2 rounded-xl bg-emerald-500 hover:bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors shadow-lg shadow-emerald-500/20">
+            <Zap className="h-4 w-4" />
             Generate Practice
-          </Button>
+          </button>
         </Link>
       </motion.div>
 
-      {/* Stats row */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard
-          index={0}
-          icon={FileText}
-          label="Saved Plans"
-          value={savedPlans}
-          sub="this season"
-          color="bg-blue-100 text-blue-600 dark:bg-blue-900 dark:text-blue-400"
-        />
-        <StatCard
-          index={1}
-          icon={Users}
-          label="Teams"
-          value={teams.length}
-          sub="active rosters"
-          color="bg-purple-100 text-purple-600 dark:bg-purple-900 dark:text-purple-400"
-        />
-        <StatCard
-          index={2}
-          icon={Clock}
-          label="Avg Practice"
-          value={practices.length > 0 ? formatMinutes(Math.round(practices.reduce((a, p) => a + p.totalMinutes, 0) / practices.length)) : "–"}
-          sub="per session"
-          color="bg-green-100 text-green-600 dark:bg-green-900 dark:text-green-400"
-        />
-        <StatCard
-          index={3}
-          icon={TrendingUp}
-          label="Drills Used"
-          value={practices.reduce((a, p) => a + p.blocks.length, 0)}
-          sub="total blocks"
-          color="bg-orange-100 text-orange-600 dark:bg-orange-900 dark:text-orange-400"
-        />
+      {/* Stat cards */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+        {[
+          { icon: FileText,   label: "Saved Plans",    value: savedPlans,              sub: "this season",   color: "text-blue-400",   bg: "bg-blue-500/15" },
+          { icon: Users,      label: "Active Roster",  value: activeTeam?.players.length ?? 0, sub: "players", color: "text-violet-400", bg: "bg-violet-500/15" },
+          { icon: Clock,      label: "Avg Practice",   value: avgDuration > 0 ? formatMinutes(avgDuration) : "–", sub: "per session", color: "text-emerald-400", bg: "bg-emerald-500/15" },
+          { icon: TrendingUp, label: "Drills Used",    value: totalDrills,             sub: "total blocks",  color: "text-amber-400",  bg: "bg-amber-500/15" },
+        ].map((s, i) => (
+          <motion.div
+            key={s.label}
+            custom={i}
+            initial="hidden"
+            animate="visible"
+            variants={fadeUp}
+            className="dos-card p-4"
+          >
+            <div className={cn("flex h-8 w-8 items-center justify-center rounded-lg mb-3", s.bg)}>
+              <s.icon className={cn("h-4 w-4", s.color)} />
+            </div>
+            <div className="font-heading text-2xl font-bold text-white">{s.value}</div>
+            <div className="text-xs text-white/40 mt-0.5">{s.label}</div>
+          </motion.div>
+        ))}
       </div>
 
-      {/* Quick actions */}
-      <section>
-        <motion.h2
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="text-base font-semibold mb-3"
-        >
-          Quick Start
-        </motion.h2>
-        <div className="grid sm:grid-cols-3 gap-3">
-          <QuickAction
-            index={0}
-            icon={Wand2}
-            title="Generate a Practice"
-            description="AI-powered plan from your inputs in seconds"
-            to="/app/generate"
-            variant="primary"
-          />
-          <QuickAction
-            index={1}
-            icon={Layout}
-            title="Use a Template"
-            description="Start from a proven practice structure"
-            to="/app/templates"
-          />
-          <QuickAction
-            index={2}
-            icon={Plus}
-            title="Browse Drill Library"
-            description="Find and add individual drills to any plan"
-            to="/app/library"
-          />
-        </div>
-      </section>
-
-      <div className="grid lg:grid-cols-2 gap-6">
-        {/* Recent practices */}
-        <motion.section custom={2} initial="hidden" animate="visible" variants={fadeInUp}>
-          <Card>
-            <CardHeader className="pb-3">
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-base">Recent Practices</CardTitle>
-                <Link to="/app/dashboard" className="text-xs text-primary hover:underline">
-                  View all
-                </Link>
-              </div>
-            </CardHeader>
-            <CardContent className="space-y-3 pt-0">
+      {/* Main content: 2/3 + 1/3 layout */}
+      <div className="grid lg:grid-cols-3 gap-4">
+        {/* Left column: recent practices + quick actions */}
+        <div className="lg:col-span-2 space-y-4">
+          {/* Recent practices */}
+          <motion.div custom={2} initial="hidden" animate="visible" variants={fadeUp} className="dos-card">
+            <div className="flex items-center justify-between px-5 py-4 border-b border-white/8">
+              <span className="font-heading font-bold text-sm text-white">Recent Practices</span>
+              <Link to="/app/practices" className="text-xs text-emerald-400 hover:text-emerald-300 transition-colors">
+                View all
+              </Link>
+            </div>
+            <div className="divide-y divide-white/6">
               {recentPractices.length === 0 ? (
-                <div className="text-center py-8">
-                  <Target className="h-8 w-8 mx-auto text-muted-foreground mb-2" />
-                  <p className="text-sm text-muted-foreground">No practices yet</p>
+                <div className="px-5 py-10 text-center">
+                  <Target className="h-8 w-8 mx-auto text-white/20 mb-2" />
+                  <p className="text-sm text-white/40">No practices yet</p>
                   <Link to="/app/generate">
-                    <Button size="sm" className="mt-3">Generate First Practice</Button>
+                    <button className="mt-3 rounded-lg bg-emerald-500/20 text-emerald-400 px-4 py-2 text-xs font-medium hover:bg-emerald-500/30 transition-colors">
+                      Generate First Practice
+                    </button>
                   </Link>
                 </div>
               ) : (
                 recentPractices.map((p) => (
                   <Link key={p.id} to={`/app/practices/${p.id}`}>
-                    <div className="flex items-center gap-3 rounded-lg p-3 hover:bg-muted transition-colors cursor-pointer">
-                      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                        <Calendar className="h-4 w-4" />
+                    <div className="flex items-center gap-3 px-5 py-3.5 hover:bg-white/4 transition-colors cursor-pointer">
+                      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-emerald-500/15">
+                        <CalendarDays className="h-4 w-4 text-emerald-400" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="font-medium text-sm truncate">{p.title}</p>
-                        <p className="text-xs text-muted-foreground">
-                          {formatMinutes(p.totalMinutes)} · {p.blocks.length} drills ·{" "}
-                          {p.goals.map((g) => CATEGORY_LABELS[g] ?? g).join(", ")}
+                        <p className="font-medium text-sm text-white truncate">{p.title}</p>
+                        <p className="text-xs text-white/40">
+                          {formatMinutes(p.totalMinutes)} · {p.blocks.length} drills
+                          {p.goals.length > 0 && " · " + p.goals.slice(0, 2).map((g) => CATEGORY_LABELS[g] ?? g).join(", ")}
                         </p>
                       </div>
                       <div className="flex items-center gap-2 shrink-0">
-                        <Badge variant={p.status === "saved" ? "success" : "secondary"} className="text-xs">
+                        <span className={cn(
+                          "text-[10px] font-medium rounded-full px-2 py-0.5",
+                          p.status === "saved" ? "bg-emerald-500/15 text-emerald-400" : "bg-white/10 text-white/50"
+                        )}>
                           {p.status}
-                        </Badge>
+                        </span>
                         <Link to={`/app/run/${p.id}`} onClick={(e) => e.stopPropagation()}>
-                          <Button size="icon-sm" variant="ghost">
+                          <div className="flex h-7 w-7 items-center justify-center rounded-lg text-white/30 hover:bg-white/10 hover:text-white/80 transition-colors">
                             <Play className="h-3.5 w-3.5" />
-                          </Button>
+                          </div>
                         </Link>
                       </div>
                     </div>
                   </Link>
                 ))
               )}
-            </CardContent>
-          </Card>
-        </motion.section>
+            </div>
+          </motion.div>
 
-        {/* Active team */}
-        <motion.section custom={3} initial="hidden" animate="visible" variants={fadeInUp}>
-          <Card>
-            <CardHeader className="pb-3">
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-base">Active Team</CardTitle>
-                <Link to="/app/teams" className="text-xs text-primary hover:underline">
-                  Manage
+          {/* Quick start tiles */}
+          <motion.div custom={3} initial="hidden" animate="visible" variants={fadeUp}>
+            <h2 className="text-xs font-semibold uppercase tracking-wider text-white/30 mb-2">Quick Start</h2>
+            <div className="grid sm:grid-cols-3 gap-3">
+              {[
+                { icon: Wand2,     title: "Generate",     desc: "AI-powered practice in seconds", to: "/app/generate",  accent: true },
+                { icon: FileText,  title: "Templates",    desc: "Start from a proven structure",   to: "/app/templates", accent: false },
+                { icon: BarChart3, title: "Analytics",    desc: "Team performance at a glance",    to: "/app/analytics", accent: false },
+              ].map((item, i) => (
+                <Link key={item.to} to={item.to}>
+                  <div className={cn(
+                    "dos-card p-4 cursor-pointer transition-all hover:-translate-y-0.5 hover:shadow-card-lg",
+                    item.accent && "border-emerald-500/30 bg-emerald-500/8"
+                  )}>
+                    <div className={cn(
+                      "flex h-8 w-8 items-center justify-center rounded-lg mb-3",
+                      item.accent ? "bg-emerald-500/20 text-emerald-400" : "bg-white/8 text-white/50"
+                    )}>
+                      <item.icon className="h-4 w-4" />
+                    </div>
+                    <div className="font-medium text-sm text-white">{item.title}</div>
+                    <div className="text-xs text-white/40 mt-0.5">{item.desc}</div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </motion.div>
+        </div>
+
+        {/* Right column: notifications + upcoming */}
+        <div className="space-y-4">
+          {/* Safety & Engagement alerts */}
+          <motion.div custom={4} initial="hidden" animate="visible" variants={fadeUp} className="dos-card">
+            <div className="flex items-center justify-between px-4 py-3 border-b border-white/8">
+              <div className="flex items-center gap-2">
+                <Bell className="h-3.5 w-3.5 text-white/40" />
+                <span className="font-heading font-bold text-xs text-white">Alerts</span>
+              </div>
+              <Link to="/app/notifications" className="text-[11px] text-emerald-400 hover:text-emerald-300">
+                See all
+              </Link>
+            </div>
+            <div className="divide-y divide-white/6">
+              {PINNED_ALERTS.map((a, i) => (
+                <div key={i} className="flex items-start gap-3 px-4 py-3">
+                  <div className={cn(
+                    "mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full",
+                    a.type === "safety" ? "bg-red-500/20 text-red-400" : "bg-amber-500/20 text-amber-400"
+                  )}>
+                    {a.type === "safety"
+                      ? <AlertTriangle className="h-2.5 w-2.5" />
+                      : <TrendingDown className="h-2.5 w-2.5" />}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs text-white/70 leading-snug">{a.message}</p>
+                    <button className="mt-1 text-[11px] text-emerald-400 hover:text-emerald-300 transition-colors">
+                      {a.action} →
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </motion.div>
+
+          {/* Upcoming events */}
+          <motion.div custom={5} initial="hidden" animate="visible" variants={fadeUp} className="dos-card">
+            <div className="flex items-center justify-between px-4 py-3 border-b border-white/8">
+              <div className="flex items-center gap-2">
+                <CalendarDays className="h-3.5 w-3.5 text-white/40" />
+                <span className="font-heading font-bold text-xs text-white">Upcoming</span>
+              </div>
+              <Link to="/app/calendar" className="text-[11px] text-emerald-400 hover:text-emerald-300">
+                Calendar
+              </Link>
+            </div>
+            <div className="divide-y divide-white/6">
+              {UPCOMING.map((ev, i) => (
+                <div key={i} className="flex items-center gap-3 px-4 py-3">
+                  <div className={cn("h-2 w-2 rounded-full shrink-0", EVENT_DOT[ev.type] ?? "bg-white/20")} />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs font-medium text-white truncate">{ev.label}</p>
+                    <p className="text-[11px] text-white/40">{ev.time}</p>
+                  </div>
+                  <span className="text-[11px] text-white/30 shrink-0">{ev.date}</span>
+                </div>
+              ))}
+            </div>
+          </motion.div>
+
+          {/* Team snapshot */}
+          {activeTeam && (
+            <motion.div custom={6} initial="hidden" animate="visible" variants={fadeUp} className="dos-card p-4">
+              <div className="flex items-center justify-between mb-3">
+                <span className="font-heading font-bold text-xs text-white">
+                  {activeTeam.name}
+                </span>
+                <Link to="/app/teams" className="text-[11px] text-emerald-400 hover:text-emerald-300">
+                  Roster
                 </Link>
               </div>
-              {activeTeam && (
-                <CardDescription>
-                  {activeTeam.name} · {activeTeam.sport}
-                </CardDescription>
-              )}
-            </CardHeader>
-            <CardContent className="pt-0">
-              {activeTeam ? (
-                <div className="space-y-4">
-                  <div className="flex gap-4 text-sm">
-                    <div>
-                      <p className="text-muted-foreground text-xs">Players</p>
-                      <p className="font-bold text-lg">{activeTeam.players.length}</p>
-                    </div>
-                    <div>
-                      <p className="text-muted-foreground text-xs">Coaches</p>
-                      <p className="font-bold text-lg">{activeTeam.coaches.length}</p>
-                    </div>
-                    <div>
-                      <p className="text-muted-foreground text-xs">Age Group</p>
-                      <p className="font-bold text-lg">{AGE_GROUP_LABELS[activeTeam.ageGroup]}</p>
-                    </div>
-                    <div>
-                      <p className="text-muted-foreground text-xs">Level</p>
-                      <p className="font-bold text-lg capitalize">{activeTeam.skillLevel}</p>
-                    </div>
+              <div className="flex gap-4 text-center mb-3">
+                {[
+                  { label: "Players", value: activeTeam.players.length },
+                  { label: "Coaches", value: activeTeam.coaches.length },
+                ].map((s) => (
+                  <div key={s.label} className="flex-1 rounded-lg bg-white/5 py-2">
+                    <div className="font-heading text-lg font-bold text-white">{s.value}</div>
+                    <div className="text-[10px] text-white/40">{s.label}</div>
                   </div>
-                  <div>
-                    <div className="flex justify-between text-xs text-muted-foreground mb-1">
-                      <span>Roster readiness</span>
-                      <span>{activeTeam.players.length} / 18 players</span>
-                    </div>
-                    <Progress value={(activeTeam.players.length / 18) * 100} className="h-1.5" />
+                ))}
+              </div>
+              <div className="flex flex-wrap gap-1.5">
+                {activeTeam.players.slice(0, 10).map((p) => (
+                  <div
+                    key={p.id}
+                    className="flex h-7 w-7 items-center justify-center rounded-full bg-white/10 text-[10px] font-semibold text-white/60"
+                    title={p.name}
+                  >
+                    {p.name.split(" ").map((n) => n[0]).join("").slice(0, 2)}
                   </div>
-                  <div className="flex gap-2">
-                    {activeTeam.coaches.map((c) => (
-                      <div
-                        key={c.id}
-                        className="flex items-center gap-1.5 rounded-full bg-muted px-3 py-1 text-xs font-medium"
-                      >
-                        <div className="h-2 w-2 rounded-full bg-primary" />
-                        {c.name}
-                      </div>
-                    ))}
+                ))}
+                {activeTeam.players.length > 10 && (
+                  <div className="flex h-7 w-7 items-center justify-center rounded-full bg-white/5 text-[10px] text-white/30">
+                    +{activeTeam.players.length - 10}
                   </div>
-                  <div className="flex gap-2 flex-wrap">
-                    {activeTeam.players.slice(0, 8).map((p) => (
-                      <div
-                        key={p.id}
-                        className="flex h-8 w-8 items-center justify-center rounded-full bg-muted text-xs font-semibold"
-                        title={p.name}
-                      >
-                        {p.name.split(" ").map((n) => n[0]).join("").slice(0, 2)}
-                      </div>
-                    ))}
-                    {activeTeam.players.length > 8 && (
-                      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-muted text-xs font-semibold text-muted-foreground">
-                        +{activeTeam.players.length - 8}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              ) : (
-                <div className="text-center py-8">
-                  <Users className="h-8 w-8 mx-auto text-muted-foreground mb-2" />
-                  <p className="text-sm text-muted-foreground">No team yet</p>
-                  <Link to="/app/teams">
-                    <Button size="sm" className="mt-3">Create Team</Button>
-                  </Link>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </motion.section>
+                )}
+              </div>
+            </motion.div>
+          )}
+        </div>
       </div>
-
-      {/* Recommended actions */}
-      <motion.section custom={4} initial="hidden" animate="visible" variants={fadeInUp}>
-        <Card className="border-primary/20 bg-gradient-to-br from-primary/5 to-transparent">
-          <CardHeader className="pb-3">
-            <div className="flex items-center gap-2">
-              <Star className="h-4 w-4 text-primary" />
-              <CardTitle className="text-base">Recommended Next Steps</CardTitle>
-            </div>
-          </CardHeader>
-          <CardContent className="pt-0 grid sm:grid-cols-3 gap-3">
-            {[
-              { text: "Generate a defensive practice for this week", to: "/app/generate" },
-              { text: "Update your roster before next session", to: "/app/teams" },
-              { text: "Explore the 90-min fundamentals template", to: "/app/templates" },
-            ].map((r, i) => (
-              <Link key={i} to={r.to}>
-                <div className="flex items-start gap-2 rounded-lg p-3 bg-background border hover:border-primary/40 transition-colors cursor-pointer">
-                  <div className="h-1.5 w-1.5 rounded-full bg-primary mt-2 shrink-0" />
-                  <p className="text-sm">{r.text}</p>
-                </div>
-              </Link>
-            ))}
-          </CardContent>
-        </Card>
-      </motion.section>
     </div>
   );
 }

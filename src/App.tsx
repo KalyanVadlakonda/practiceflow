@@ -10,6 +10,10 @@ import { Teams } from "@/features/teams/Teams";
 import { RunPractice } from "@/features/run-practice/RunPractice";
 import { Templates } from "@/features/templates/Templates";
 import { Settings } from "@/features/settings/Settings";
+import { SeasonCalendar } from "@/features/calendar/SeasonCalendar";
+import { Notifications } from "@/features/notifications/Notifications";
+import { Analytics } from "@/features/analytics/Analytics";
+import { Platform } from "@/features/platform/Platform";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -34,14 +38,26 @@ export default function App() {
 
           {/* Main app layout */}
           <Route path="/app" element={<AppLayout />}>
-            <Route path="dashboard" element={<Dashboard />} />
-            <Route path="generate" element={<PracticeGenerator />} />
-            <Route path="practices/:id" element={<PracticePlanView />} />
-            <Route path="library" element={<DrillLibrary />} />
-            <Route path="diagram-studio" element={<DiagramStudio />} />
-            <Route path="teams" element={<Teams />} />
-            <Route path="templates" element={<Templates />} />
-            <Route path="settings" element={<Settings />} />
+            <Route path="dashboard"       element={<Dashboard />} />
+            <Route path="generate"        element={<PracticeGenerator />} />
+            <Route path="practices/:id"   element={<PracticePlanView />} />
+            <Route path="library"         element={<DrillLibrary />} />
+            <Route path="diagram-studio"  element={<DiagramStudio />} />
+            <Route path="teams"           element={<Teams />} />
+            <Route path="templates"       element={<Templates />} />
+            <Route path="settings"        element={<Settings />} />
+
+            {/* New DiamondOS routes */}
+            <Route path="calendar"        element={<SeasonCalendar />} />
+            <Route path="notifications"   element={<Notifications />} />
+            <Route path="analytics"       element={<Analytics />} />
+            <Route path="practices"       element={<Navigate to="/app/dashboard" replace />} />
+
+            {/* Platform sub-pages */}
+            <Route path="platform/entity" element={<Platform page="entity" />} />
+            <Route path="platform/org"    element={<Platform page="org" />} />
+            <Route path="platform/cms"    element={<Platform page="cms" />} />
+            <Route path="platform"        element={<Navigate to="/app/platform/entity" replace />} />
           </Route>
 
           {/* Catch-all */}
