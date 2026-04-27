@@ -11,12 +11,12 @@ export function AppLayout() {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      {/* Sidebar — desktop only */}
-      <div className="hidden md:block">
+      {/* Sidebar — always dark navy, desktop only */}
+      <div className="hidden md:block dark">
         <Sidebar />
       </div>
 
-      {/* Main content — desktop */}
+      {/* Main content — desktop, light theme */}
       <motion.main
         animate={{ marginLeft: sidebarOpen ? 240 : 64 }}
         transition={{ type: "spring", stiffness: 300, damping: 30 }}
@@ -34,7 +34,10 @@ export function AppLayout() {
         <div className="flex-1 p-4 pb-20 overflow-auto">
           <Outlet />
         </div>
-        <MobileNav />
+        {/* Mobile nav — dark */}
+        <div className="dark">
+          <MobileNav />
+        </div>
       </div>
 
       <ToastContainer />
