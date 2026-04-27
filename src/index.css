@@ -3,15 +3,70 @@
 @tailwind utilities;
 
 @layer base {
-  /* DiamondOS — dark navy as default */
+  /*
+   * DiamondOS — dark sidebar, light content area (matches reference site)
+   * Sidebar stays navy-950; main canvas is white / slate-50.
+   */
   :root {
-    --background:    215 58% 12%;   /* #0c1a2e navy-900 */
+    /* ── Main canvas ── */
+    --background:    210 20% 98%;   /* #f8fafc slate-50 */
+    --foreground:    215 50% 12%;   /* #0c1a2e navy text */
+
+    /* ── Cards / surfaces ── */
+    --card:          0 0% 100%;
+    --card-foreground: 215 50% 12%;
+    --popover:       0 0% 100%;
+    --popover-foreground: 215 50% 12%;
+
+    /* ── Brand green ── */
+    --primary:       153 71% 36%;   /* #18a163 */
+    --primary-foreground: 0 0% 100%;
+
+    /* ── Secondary / muted ── */
+    --secondary:     210 20% 96%;
+    --secondary-foreground: 215 30% 30%;
+    --muted:         210 20% 95%;
+    --muted-foreground: 215 16% 46%;
+
+    /* ── Accent ── */
+    --accent:        210 20% 94%;
+    --accent-foreground: 215 50% 12%;
+
+    /* ── Feedback ── */
+    --destructive:   0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+
+    /* ── Borders / inputs ── */
+    --border:        214 20% 88%;   /* #e2e8f0 */
+    --input:         214 20% 88%;
+    --ring:          153 71% 36%;
+
+    /* ── Border radius (10px) ── */
+    --radius:        0.625rem;
+
+    /* ── Sidebar — always dark navy ── */
+    --sidebar-bg:    215 62% 9%;    /* #0c1a2e navy-950 */
+    --sidebar-fg:    215 20% 60%;
+    --sidebar-hover-bg: 215 44% 14%;
+
+    /* ── Top bar ── */
+    --topbar-bg:     0 0% 100%;
+
+    /* ── Semantic ── */
+    --success:       153 71% 36%;
+    --warning:       38 92% 50%;
+    --safety:        0 72% 51%;
+  }
+
+  /* Dark mode (optional toggle) */
+  .dark {
+    --background:    215 58% 12%;
     --foreground:    210 40% 96%;
-    --card:          215 52% 16%;   /* navy-800 ish */
+    --card:          215 52% 16%;
     --card-foreground: 210 40% 96%;
     --popover:       215 52% 14%;
     --popover-foreground: 210 40% 96%;
-    --primary:       153 71% 36%;   /* #18a163 emerald-500 */
+    --primary:       153 71% 36%;
     --primary-foreground: 0 0% 100%;
     --secondary:     215 40% 22%;
     --secondary-foreground: 210 40% 90%;
@@ -24,47 +79,7 @@
     --border:        215 32% 22%;
     --input:         215 32% 22%;
     --ring:          153 71% 36%;
-    --radius:        0.625rem;      /* 10px */
-
-    /* DiamondOS semantic tokens */
-    --sidebar-bg:    215 62% 9%;    /* navy-950 */
-    --sidebar-fg:    215 20% 65%;
-    --sidebar-active-bg: 153 71% 36%;
-    --sidebar-active-fg: 0 0% 100%;
-    --sidebar-hover-bg: 215 44% 16%;
     --topbar-bg:     215 58% 11%;
-    --success:       153 71% 36%;
-    --warning:       38 92% 50%;
-    --safety:        0 72% 51%;
-  }
-
-  /* Light mode override (toggled via .light class) */
-  .light {
-    --background:    0 0% 98%;
-    --foreground:    215 50% 12%;
-    --card:          0 0% 100%;
-    --card-foreground: 215 50% 12%;
-    --popover:       0 0% 100%;
-    --popover-foreground: 215 50% 12%;
-    --primary:       153 71% 36%;
-    --primary-foreground: 0 0% 100%;
-    --secondary:     215 20% 94%;
-    --secondary-foreground: 215 50% 12%;
-    --muted:         215 20% 94%;
-    --muted-foreground: 215 16% 46%;
-    --accent:        215 20% 94%;
-    --accent-foreground: 215 50% 12%;
-    --destructive:   0 84% 60%;
-    --destructive-foreground: 0 0% 100%;
-    --border:        215 20% 88%;
-    --input:         215 20% 88%;
-    --ring:          153 71% 36%;
-    --sidebar-bg:    215 62% 9%;
-    --sidebar-fg:    215 20% 65%;
-    --sidebar-active-bg: 153 71% 36%;
-    --sidebar-active-fg: 0 0% 100%;
-    --sidebar-hover-bg: 215 44% 16%;
-    --topbar-bg:     0 0% 100%;
   }
 }
 
@@ -73,7 +88,7 @@
     @apply border-border;
   }
   html {
-    color-scheme: dark;
+    color-scheme: light;
   }
   body {
     @apply bg-background text-foreground;
@@ -89,7 +104,7 @@
 }
 
 @layer components {
-  /* DiamondOS Card */
+  /* Standard card (light surface) */
   .dos-card {
     @apply rounded-xl border bg-card shadow-card;
   }
@@ -97,26 +112,51 @@
     @apply rounded-xl border bg-card shadow-card-lg;
   }
 
-  /* Status pills */
-  .pill-safety {
-    @apply inline-flex items-center gap-1 rounded-full bg-red-500/15 px-2 py-0.5 text-xs font-medium text-red-400;
+  /* Generator form — dark navy panel (matches reference site) */
+  .gen-panel {
+    background: #0c1a2e;
+    border-radius: 14px;
+    border: 1px solid rgba(255,255,255,0.08);
+    box-shadow: 0 8px 40px rgba(0,0,0,0.35);
+    position: relative;
+    overflow: hidden;
   }
-  .pill-warning {
-    @apply inline-flex items-center gap-1 rounded-full bg-amber-500/15 px-2 py-0.5 text-xs font-medium text-amber-400;
-  }
-  .pill-success {
-    @apply inline-flex items-center gap-1 rounded-full bg-emerald-500/15 px-2 py-0.5 text-xs font-medium text-emerald-400;
-  }
-  .pill-info {
-    @apply inline-flex items-center gap-1 rounded-full bg-blue-500/15 px-2 py-0.5 text-xs font-medium text-blue-400;
+  .gen-panel::before {
+    content: "";
+    position: absolute;
+    top: -80px;
+    right: -80px;
+    width: 320px;
+    height: 320px;
+    background: radial-gradient(circle, rgba(24,161,99,0.18) 0%, transparent 70%);
+    pointer-events: none;
   }
 
-  /* Skill bar */
-  .skill-bar {
-    @apply h-1.5 rounded-full bg-white/10 overflow-hidden;
+  /* Generator input (white on dark panel) */
+  .gen-input {
+    @apply w-full rounded-lg border bg-white/10 px-3 py-2 text-sm text-white placeholder:text-white/35
+           focus:outline-none focus:ring-1 focus:ring-emerald-500/60 focus:border-emerald-500/60 transition-colors;
+    border-color: rgba(255,255,255,0.15);
   }
-  .skill-bar-fill {
-    @apply h-full rounded-full bg-emerald-500 transition-all duration-500;
+  .gen-label {
+    @apply block text-[11px] font-semibold uppercase tracking-wider text-white/50 mb-1.5;
+  }
+  .gen-select {
+    @apply gen-input appearance-none cursor-pointer;
+  }
+
+  /* Status pills */
+  .pill-safety {
+    @apply inline-flex items-center gap-1 rounded-full bg-red-500/15 px-2 py-0.5 text-xs font-medium text-red-500;
+  }
+  .pill-warning {
+    @apply inline-flex items-center gap-1 rounded-full bg-amber-500/15 px-2 py-0.5 text-xs font-medium text-amber-600;
+  }
+  .pill-success {
+    @apply inline-flex items-center gap-1 rounded-full bg-emerald-500/15 px-2 py-0.5 text-xs font-medium text-emerald-600;
+  }
+  .pill-info {
+    @apply inline-flex items-center gap-1 rounded-full bg-blue-500/10 px-2 py-0.5 text-xs font-medium text-blue-600;
   }
 
   /* Sidebar nav section label */
@@ -144,20 +184,14 @@
 
   .glass {
     backdrop-filter: blur(12px);
-    background: rgba(12, 26, 46, 0.75);
-    border: 1px solid rgba(255,255,255,0.08);
+    background: rgba(255,255,255,0.7);
+    border: 1px solid rgba(0,0,0,0.08);
   }
 
   .text-gradient-green {
-    background: linear-gradient(135deg, #18a163 0%, #4db380 100%);
+    background: linear-gradient(135deg, #0d6640 0%, #18a163 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
   }
-
-  /* Entity tier indentation helpers */
-  .tier-1 { @apply pl-0; }
-  .tier-2 { @apply pl-4 border-l border-white/10; }
-  .tier-3 { @apply pl-8 border-l border-white/10; }
-  .tier-4 { @apply pl-12 border-l border-white/10; }
 }

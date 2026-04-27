@@ -37,10 +37,10 @@ import type { DrillCategory, Drill } from "@/types";
 // ─── Category badge colors (dark-theme) ───────────────────────────────────────
 
 const CAT_DARK: Record<string, string> = {
-  fielding:    "bg-emerald-500/15 text-emerald-400 border-emerald-500/25",
+  fielding:    "bg-emerald-50 text-emerald-600 border-emerald-500/25",
   hitting:     "bg-blue-500/15 text-blue-400 border-blue-500/25",
-  pitching:    "bg-red-500/15 text-red-400 border-red-500/25",
-  baserunning: "bg-amber-500/15 text-amber-400 border-amber-500/25",
+  pitching:    "bg-red-500/15 text-red-500 border-red-500/25",
+  baserunning: "bg-amber-500/15 text-amber-500 border-amber-500/25",
   conditioning:"bg-violet-500/15 text-violet-400 border-violet-500/25",
   warmup:      "bg-teal-500/15 text-teal-400 border-teal-500/25",
   catching:    "bg-pink-500/15 text-pink-400 border-pink-500/25",
@@ -57,7 +57,7 @@ function DifficultyStars({ value }: { value: number }) {
           key={s}
           className={cn(
             "h-3 w-3",
-            s <= value ? "text-amber-400 fill-amber-400" : "text-white/15"
+            s <= value ? "text-amber-500 fill-amber-400" : "text-muted-foreground/40"
           )}
         />
       ))}
@@ -83,16 +83,16 @@ function DrillCard({ drill, index }: { drill: Drill; index: number }) {
         <div className="flex items-start gap-3">
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 flex-wrap mb-1">
-              <span className="font-mono text-[10px] text-white/30">{drillId(index)}</span>
-              <h3 className="font-heading font-bold text-sm text-white leading-snug">{drill.name}</h3>
+              <span className="font-mono text-[10px] text-muted-foreground/70">{drillId(index)}</span>
+              <h3 className="font-heading font-bold text-sm text-foreground leading-snug">{drill.name}</h3>
               <span className={cn(
                 "inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] font-medium",
-                CAT_DARK[drill.category] ?? "bg-white/10 text-white/50 border-white/15"
+                CAT_DARK[drill.category] ?? "bg-slate-100 text-muted-foreground border"
               )}>
                 {CATEGORY_LABELS[drill.category]}
               </span>
             </div>
-            <p className="text-xs text-white/50 line-clamp-2 leading-relaxed">
+            <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed">
               {drill.description}
             </p>
           </div>
@@ -100,7 +100,7 @@ function DrillCard({ drill, index }: { drill: Drill; index: number }) {
         </div>
 
         {/* Meta row */}
-        <div className="flex flex-wrap gap-3 text-[11px] text-white/40 mt-3">
+        <div className="flex flex-wrap gap-3 text-[11px] text-muted-foreground mt-3">
           <span className="flex items-center gap-1">
             <Clock className="h-3 w-3" />
             {formatMinutes(drill.durationMin)}–{formatMinutes(drill.durationMax)}
@@ -112,13 +112,13 @@ function DrillCard({ drill, index }: { drill: Drill; index: number }) {
           <span className="flex items-center gap-1">
             <Zap className={cn(
               "h-3 w-3",
-              drill.intensity === "high" ? "text-red-400" :
-              drill.intensity === "medium" ? "text-amber-400" : "text-emerald-400"
+              drill.intensity === "high" ? "text-red-500" :
+              drill.intensity === "medium" ? "text-amber-500" : "text-emerald-600"
             )} />
             <span className={cn(
               "capitalize",
-              drill.intensity === "high" ? "text-red-400" :
-              drill.intensity === "medium" ? "text-amber-400" : "text-emerald-400"
+              drill.intensity === "high" ? "text-red-500" :
+              drill.intensity === "medium" ? "text-amber-500" : "text-emerald-600"
             )}>
               {drill.intensity}
             </span>
@@ -129,7 +129,7 @@ function DrillCard({ drill, index }: { drill: Drill; index: number }) {
               Indoor OK
             </span>
           )}
-          <span className="capitalize text-white/30">
+          <span className="capitalize text-muted-foreground/70">
             {drill.sport === "both" ? "⚾ / 🥎 Both" : drill.sport}
           </span>
         </div>
@@ -138,7 +138,7 @@ function DrillCard({ drill, index }: { drill: Drill; index: number }) {
         {drill.equipment.length > 0 && (
           <div className="flex flex-wrap gap-1 mt-2">
             {drill.equipment.map((e) => (
-              <span key={e} className="rounded-full border border-white/10 bg-white/5 px-2 py-0.5 text-[10px] text-white/40">
+              <span key={e} className="rounded-full border border bg-muted/40 px-2 py-0.5 text-[10px] text-muted-foreground">
                 {e}
               </span>
             ))}
@@ -148,7 +148,7 @@ function DrillCard({ drill, index }: { drill: Drill; index: number }) {
 
       {/* Diagram preview */}
       {drill.diagram && (
-        <div className="mx-4 mb-2 rounded-lg overflow-hidden border border-white/8 bg-white/4">
+        <div className="mx-4 mb-2 rounded-lg overflow-hidden border border bg-muted/30">
           <DrillDiagramPreview diagram={drill.diagram} />
         </div>
       )}
@@ -156,7 +156,7 @@ function DrillCard({ drill, index }: { drill: Drill; index: number }) {
       {/* Expand toggle */}
       <button
         onClick={() => setExpanded(!expanded)}
-        className="w-full flex items-center justify-center gap-1.5 py-2.5 border-t border-white/8 text-xs text-white/40 hover:bg-white/4 hover:text-white/70 transition-colors"
+        className="w-full flex items-center justify-center gap-1.5 py-2.5 border-t border text-xs text-muted-foreground hover:bg-muted/30 hover:text-foreground/80 transition-colors"
       >
         {expanded ? (
           <><ChevronUp className="h-3.5 w-3.5" />Show less</>
@@ -172,22 +172,22 @@ function DrillCard({ drill, index }: { drill: Drill; index: number }) {
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
-            className="overflow-hidden border-t border-white/8"
+            className="overflow-hidden border-t border"
           >
             <div className="p-4 space-y-4">
               {/* Setup */}
               <div>
-                <p className="text-[10px] font-semibold uppercase tracking-wider text-white/30 mb-1.5">Setup</p>
-                <p className="text-xs text-white/60 leading-relaxed">{drill.setupInstructions}</p>
+                <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/70 mb-1.5">Setup</p>
+                <p className="text-xs text-muted-foreground leading-relaxed">{drill.setupInstructions}</p>
               </div>
 
               {/* Steps */}
               <div>
-                <p className="text-[10px] font-semibold uppercase tracking-wider text-white/30 mb-1.5">Steps</p>
+                <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/70 mb-1.5">Steps</p>
                 <ol className="space-y-1.5">
                   {drill.stepByStep.map((step, i) => (
-                    <li key={i} className="flex gap-2 text-xs text-white/60">
-                      <span className="shrink-0 font-bold text-emerald-400">{i + 1}.</span>
+                    <li key={i} className="flex gap-2 text-xs text-muted-foreground">
+                      <span className="shrink-0 font-bold text-emerald-600">{i + 1}.</span>
                       <span className="leading-relaxed">{step}</span>
                     </li>
                   ))}
@@ -196,11 +196,11 @@ function DrillCard({ drill, index }: { drill: Drill; index: number }) {
 
               {/* Teaching points */}
               <div>
-                <p className="text-[10px] font-semibold uppercase tracking-wider text-white/30 mb-1.5">Teaching Points</p>
+                <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/70 mb-1.5">Teaching Points</p>
                 <ul className="space-y-1">
                   {drill.teachingPoints.map((tp, i) => (
-                    <li key={i} className="flex gap-2 text-xs text-white/60">
-                      <span className="text-emerald-400 shrink-0">✓</span>
+                    <li key={i} className="flex gap-2 text-xs text-muted-foreground">
+                      <span className="text-emerald-600 shrink-0">✓</span>
                       <span className="leading-relaxed">{tp}</span>
                     </li>
                   ))}
@@ -209,7 +209,7 @@ function DrillCard({ drill, index }: { drill: Drill; index: number }) {
 
               {/* Common errors */}
               <div className="rounded-lg bg-amber-500/8 border border-amber-500/20 p-3">
-                <p className="text-[10px] font-semibold text-amber-400 mb-1.5 uppercase tracking-wider">
+                <p className="text-[10px] font-semibold text-amber-500 mb-1.5 uppercase tracking-wider">
                   Common Errors
                 </p>
                 <ul className="space-y-1">
@@ -225,12 +225,12 @@ function DrillCard({ drill, index }: { drill: Drill; index: number }) {
               {/* Age + skill badges */}
               <div className="flex flex-wrap gap-1.5">
                 {drill.ageBands.map((a) => (
-                  <span key={a} className="rounded-full border border-white/12 bg-white/6 px-2 py-0.5 text-[10px] text-white/50">
+                  <span key={a} className="rounded-full border border bg-muted/50 px-2 py-0.5 text-[10px] text-muted-foreground">
                     {AGE_GROUP_LABELS[a]}
                   </span>
                 ))}
                 {drill.skillLevels.map((s) => (
-                  <span key={s} className="rounded-full border border-white/12 bg-white/6 px-2 py-0.5 text-[10px] text-white/50 capitalize">
+                  <span key={s} className="rounded-full border border bg-muted/50 px-2 py-0.5 text-[10px] text-muted-foreground capitalize">
                     {SKILL_LABELS[s]}
                   </span>
                 ))}
@@ -286,8 +286,8 @@ export function DrillLibrary() {
     <div className="max-w-5xl mx-auto space-y-5">
       {/* Header */}
       <div>
-        <h2 className="font-heading text-xl text-white">Drill Library</h2>
-        <p className="text-sm text-white/40 mt-0.5">
+        <h2 className="font-heading text-xl text-foreground">Drill Library</h2>
+        <p className="text-sm text-muted-foreground mt-0.5">
           {DRILLS.length} drills across baseball and softball
         </p>
       </div>
@@ -295,17 +295,17 @@ export function DrillLibrary() {
       {/* Search + filters */}
       <div className="space-y-2">
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/30" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/70" />
           <input
             placeholder="Search drills by name, tag, or description…"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full rounded-xl border border-white/12 bg-white/6 pl-9 pr-4 py-2.5 text-sm text-white placeholder:text-white/30 outline-none focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/30 transition-colors"
+            className="w-full rounded-xl border border bg-muted/50 pl-9 pr-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/70 outline-none focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/30 transition-colors"
           />
         </div>
 
         <div className="flex flex-wrap gap-2 items-center">
-          <Filter className="h-3.5 w-3.5 text-white/30" />
+          <Filter className="h-3.5 w-3.5 text-muted-foreground/70" />
 
           <Select value={sportFilter} onValueChange={setSportFilter}>
             <SelectTrigger className="w-36 h-8 text-xs">
@@ -359,8 +359,8 @@ export function DrillLibrary() {
             className={cn(
               "flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-medium transition-all",
               indoorOnly
-                ? "border-emerald-500/40 bg-emerald-500/15 text-emerald-400"
-                : "border-white/12 text-white/40 hover:border-white/25 hover:text-white/70"
+                ? "border-emerald-500/40 bg-emerald-50 text-emerald-600"
+                : "border text-muted-foreground hover:border-white/25 hover:text-foreground/80"
             )}
           >
             <Home className="h-3 w-3" />
@@ -370,7 +370,7 @@ export function DrillLibrary() {
           {hasFilters && (
             <button
               onClick={clearFilters}
-              className="flex items-center gap-1 text-xs text-white/30 hover:text-white/60 transition-colors"
+              className="flex items-center gap-1 text-xs text-muted-foreground/70 hover:text-muted-foreground transition-colors"
             >
               <X className="h-3 w-3" />
               Clear
@@ -380,16 +380,16 @@ export function DrillLibrary() {
       </div>
 
       {/* Results count */}
-      <div className="text-xs text-white/30">
+      <div className="text-xs text-muted-foreground/70">
         Showing {filtered.length} of {DRILLS.length} drills
       </div>
 
       {/* Drill grid */}
       {filtered.length === 0 ? (
         <div className="dos-card flex flex-col items-center py-20 gap-3">
-          <BookOpen className="h-10 w-10 text-white/15" />
-          <p className="font-heading text-base text-white/50">No drills found</p>
-          <p className="text-sm text-white/30">Try adjusting your search or filters.</p>
+          <BookOpen className="h-10 w-10 text-muted-foreground/40" />
+          <p className="font-heading text-base text-muted-foreground">No drills found</p>
+          <p className="text-sm text-muted-foreground/70">Try adjusting your search or filters.</p>
         </div>
       ) : (
         <div className="grid sm:grid-cols-2 gap-3">
